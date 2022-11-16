@@ -45,9 +45,9 @@ function init(){
         new THREE.BoxGeometry(3,5,7),
         new THREE.MeshLambertMaterial({color : 0xdddddd})
     )
-    box.position.x = 2;
-    box.position.y = 2;
-    box.position.z = 2;
+    box.position.x = 1.5;
+    box.position.y = 2.5;
+    box.position.z = 3.5;
     box.castShadow = true;
     scene.add(box)
 
