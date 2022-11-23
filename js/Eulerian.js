@@ -17,9 +17,9 @@ function init(){
     //camera
     camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
     
-    camera.position.x = 30;
-    camera.position.y = 30;
-    camera.position.z = 30;
+    camera.position.x = 10;
+    camera.position.y = 10;
+    camera.position.z = 10;
     scene.add(camera);
     
     //ligths
@@ -35,7 +35,7 @@ function init(){
 
     //object(box)
     let box = new THREE.Mesh(
-        new THREE.BoxGeometry(3,5,7),
+        new THREE.BoxGeometry(1,1,1),
         new THREE.MeshLambertMaterial({color : 0xdddddd})
     )
     box.matrixAutoUpdate = false;
@@ -44,21 +44,49 @@ function init(){
 
 
     //gui 생성
-    let guicontrols = new function(){
-        this.Euler1 = 0;
-        this.Euler2 = 0;
-        this.Euler3 = 0;
+
+    const gui = new dat.GUI();
+    const posFolder = gui.addFolder('Position');
+    const lenFolder = gui.addFolder('Length');
+    const rotFolder = gui.addFolder('Rotation');
+
+
+    let pos = new function(){
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
     }
-    let gui = new dat.GUI();
-    gui.add(guicontrols, "Euler1", -2 * Math.PI, 2 * Math.PI);
-    gui.add(guicontrols, "Euler2", -2 * Math.PI, 2 * Math.PI);
-    gui.add(guicontrols, "Euler3", -2 * Math.PI, 2 * Math.PI);
+    posFolder.add(pos, "x", -2 * Math.PI, 2 * Math.PI);
+    posFolder.add(pos, "y", -2 * Math.PI, 2 * Math.PI);
+    posFolder.add(pos, "z", -2 * Math.PI, 2 * Math.PI);
+    
+    let rot = new function(){
+        this.EulerZ1 = 0;
+        this.EulerX = 0;
+        this.EulerZ2 = 0;
+    } //z-x-z' sequence
+    rotFolder.add(rot, "EulerZ1", -2 * Math.PI, 2 * Math.PI);
+    rotFolder.add(rot, "EulerX", -2 * Math.PI, 2 * Math.PI);
+    rotFolder.add(rot, "EulerZ2", -2 * Math.PI, 2 * Math.PI);
+
+    let len = new function(){
+        this.lengthX=1;
+        this.lengthY=1;
+        this.lengthZ=1;
+    }
+    lenFolder.add(len, "lengthX", 0, 10);
+    lenFolder.add(len, "lengthY", 0, 10);
+    lenFolder.add(len, "lengthZ", 0, 10);
 
     function renderScene(){
-        box.matrix = new THREE.Matrix4().makeRotationX(guicontrols.Euler3).multiply(
-            new THREE.Matrix4().makeRotationY(guicontrols.Euler2).multiply(
-                new THREE.Matrix4().makeRotationX(guicontrols.Euler1).multiply(
-                    new THREE.Matrix4().makeTranslation(1.5, 2.5, 3.5)
+        
+        box.matrix = new THREE.Matrix4().makeRotationY(rot.EulerZ2).multiply(
+            new THREE.Matrix4().makeRotationZ(rot.EulerX).multiply(
+                new THREE.Matrix4().makeRotationY(rot.EulerZ1).multiply(
+                    new THREE.Matrix4().set(len.lengthY, 0, 0, pos.y, 0, len.lengthZ, 0, pos.z, 0, 0, len.lengthX, pos.x, 0, 0, 0, 1)
+//                    new THREE.Matrix4().makeTranslation(pos.y, pos.z, pos.x).multiply(
+//                        new THREE.Matrix4().makeScale(len.lengthX, len.lengthY, len.lengthZ)
+//                    )
                 )
             )
         );
